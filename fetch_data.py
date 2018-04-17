@@ -1,6 +1,8 @@
 import os
 import tarfile
+import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from six.moves import urllib
 
@@ -21,6 +23,14 @@ def load_housing_data(housing_path=HOUSING_PATH):
     csv_path = os.path.join(housing_path, "housing.csv")
     return pd.read_csv(csv_path)
 
+def split_train_test(data, test_ratio):
+    np.random.seed(42)
+    shuffled_indices = np.random.permutation(len(data))
+    test_set_size = int(len(data) * test_ratio)
+    test_indices = shuffled_indices[:test_set_size]
+    train_indices = shuffled_indices[test_set_size:]
+    return data.iloc[train_indices], data.iloc[test_indices]
+
 fetch_housing_data()
 housing = load_housing_data()
 # show first 5 rows.ß
@@ -36,6 +46,9 @@ housing.describe()
 # plot a histogram.
 # [tips %: Only in a Jupyter notebook]
 %matplotlib inline
-import matplotlib.pyplot as plt
 housing.hist(bins=50, figsize=(20,15))
 plt.show()
+
+#create a test set.
+train_set, test_set = split_train_test(housing, 0.2)
+print(str(len(train_set)) + ' train + ' + str(len(test_set)) + ' test')
